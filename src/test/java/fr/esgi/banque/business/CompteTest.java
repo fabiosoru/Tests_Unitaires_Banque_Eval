@@ -213,4 +213,49 @@ class CompteTest {
 		assertThrows(IllegalArgumentException.class, () -> compte.crediter(BigDecimal.ZERO));
 	}
 
+	// C4 : debiter n'accepte qu'un montant strictement positif
+
+	@Test
+	@DisplayName("C4 : débiter un montant null lève une exception")
+	void DebiterUnMontantNullDoitLeverUneException() {
+		// Arrange
+		Compte compte = new Compte("FR001", "Alice", new BigDecimal("100.00"), new BigDecimal("200"));
+
+		// Act + Assert
+		assertThrows(IllegalArgumentException.class, () -> compte.debiter(null));
+	}
+
+	@Test
+	@DisplayName("C4 : débiter un montant négatif lève une exception")
+	void DebiterUnMontantNegatifDoitLeverUneException() {
+		// Arrange
+		Compte compte = new Compte("FR001", "Alice", new BigDecimal("100.00"), new BigDecimal("200"));
+
+		// Act + Assert
+		assertThrows(IllegalArgumentException.class, () -> compte.debiter(new BigDecimal("-10.00")));
+	}
+
+	@Test
+	@DisplayName("C4 : débiter un montant nul lève une exception")
+	void DebiterUnMontantNulDoitLeverUneException() {
+		// Arrange
+		Compte compte = new Compte("FR001", "Alice", new BigDecimal("100.00"), new BigDecimal("200"));
+
+		// Act + Assert
+		assertThrows(IllegalArgumentException.class, () -> compte.debiter(BigDecimal.ZERO));
+	}
+
+	@Test
+	@DisplayName("C4 : débiter un montant positif diminue le solde")
+	void DebiterUnMontantPositifDiminueLeSolde() {
+		// Arrange
+		Compte compte = new Compte("FR001", "Alice", new BigDecimal("100.00"), new BigDecimal("200"));
+
+		// Act
+		compte.debiter(new BigDecimal("30.00"));
+
+		// Assert
+		assertThat(compte.getSolde()).isEqualByComparingTo("70.00");
+	}
+
 }
