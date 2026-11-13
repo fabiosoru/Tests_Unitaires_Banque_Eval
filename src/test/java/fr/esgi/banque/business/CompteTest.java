@@ -116,4 +116,69 @@ class CompteTest {
 				() -> new Compte("FR001", "   ", soldeInitial, decouvertAutorise));
 	}
 
+	// C2 : solde initial et découvert autorisé obligatoires, découvert positif ou nul
+
+	@Test
+	@DisplayName("C2 : un solde initial null lève une exception")
+	void UnSoldeInitialNullDoitLeverUneException() {
+		// Arrange
+		BigDecimal decouvertAutorise = new BigDecimal("200");
+
+		// Act + Assert
+		assertThrows(IllegalArgumentException.class,
+				() -> new Compte("FR001", "Alice", null, decouvertAutorise));
+	}
+
+	@Test
+	@DisplayName("C2 : un découvert autorisé null lève une exception")
+	void UnDecouvertAutoriseNullDoitLeverUneException() {
+		// Arrange
+		BigDecimal soldeInitial = new BigDecimal("100.00");
+
+		// Act + Assert
+		assertThrows(IllegalArgumentException.class,
+				() -> new Compte("FR001", "Alice", soldeInitial, null));
+	}
+
+	@Test
+	@DisplayName("C2 : un découvert autorisé négatif lève une exception")
+	void UnDecouvertAutoriseNegatifDoitLeverUneException() {
+		// Arrange
+		BigDecimal soldeInitial = new BigDecimal("100.00");
+		BigDecimal decouvertAutorise = new BigDecimal("-0.01");
+
+		// Act + Assert
+		assertThrows(IllegalArgumentException.class,
+				() -> new Compte("FR001", "Alice", soldeInitial, decouvertAutorise));
+	}
+
+	@Test
+	@DisplayName("C2 : un découvert autorisé à zéro est accepté")
+	void UnDecouvertAutoriseAZeroEstAccepte() {
+		// Arrange
+		BigDecimal soldeInitial = new BigDecimal("100.00");
+		BigDecimal decouvertAutorise = BigDecimal.ZERO;
+
+		// Act
+		Compte compte = new Compte("FR001", "Alice", soldeInitial, decouvertAutorise);
+
+		// Assert
+		assertThat(compte.getDecouvertAutorise()).isEqualByComparingTo("0");
+	}
+
+	@Test
+	@DisplayName("C2 : le solde initial et le découvert autorisé sont bien enregistrés")
+	void LeSoldeInitialEtLeDecouvertAutoriseSontEnregistres() {
+		// Arrange
+		BigDecimal soldeInitial = new BigDecimal("100.00");
+		BigDecimal decouvertAutorise = new BigDecimal("200");
+
+		// Act
+		Compte compte = new Compte("FR001", "Alice", soldeInitial, decouvertAutorise);
+
+		// Assert
+		assertThat(compte.getSolde()).isEqualByComparingTo("100.00");
+		assertThat(compte.getDecouvertAutorise()).isEqualByComparingTo("200");
+	}
+
 }
