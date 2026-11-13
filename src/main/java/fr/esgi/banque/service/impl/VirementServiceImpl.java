@@ -1,5 +1,6 @@
 package fr.esgi.banque.service.impl;
 
+import fr.esgi.banque.service.CompteIntrouvableException;
 import fr.esgi.banque.service.CompteRepository;
 import fr.esgi.banque.service.NotificationService;
 
@@ -20,6 +21,8 @@ public class VirementServiceImpl {
 
 	public void virer(String numeroSource, String numeroDestination, BigDecimal montant) {
 		verifierParametres(numeroSource, numeroDestination, montant);
+		repository.trouver(numeroSource).orElseThrow(() -> new CompteIntrouvableException(numeroSource));
+		repository.trouver(numeroDestination).orElseThrow(() -> new CompteIntrouvableException(numeroDestination));
 	}
 
 	private void verifierParametres(String numeroSource, String numeroDestination, BigDecimal montant) {
