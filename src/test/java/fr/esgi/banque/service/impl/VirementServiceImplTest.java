@@ -1,5 +1,7 @@
 package fr.esgi.banque.service.impl;
 
+import fr.esgi.banque.business.Compte;
+import fr.esgi.banque.service.CompteIntrouvableException;
 import fr.esgi.banque.service.CompteRepository;
 import fr.esgi.banque.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +17,10 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class VirementServiceImplTest {
@@ -69,6 +73,32 @@ class VirementServiceImplTest {
 
 		// Act + Assert
 		assertThrows(IllegalArgumentException.class, () -> service.virer(NUMERO_SOURCE, NUMERO_SOURCE, montant));
+	}
+
+	// V3 : si l'un des deux comptes n'existe pas, uen exception CompteIntrouvableException est levée
+
+	@Test
+	@DisplayName("V3 : un virement depuis un compte source inexistant est refusé")
+	void UnVirementDepuisUnCompteSourceInexistantDoitLeverUneException() {
+		// Arrange
+		BigDecimal montant = new BigDecimal("100");
+		when(repository.trouver(NUMERO_SOURCE)).thenReturn(Optional.empty());
+
+		// Act + Assert
+		assertThrows(CompteIntrouvableException.class, () -> service.virer(NUMERO_SOURCE, NUMERO_DESTINATION, montant));
+	}
+
+	@Test
+	@DisplayName("V3 : un virement vers un compte destination inexistant est refusé")
+	void UnVirementVersUnCompteDestinationInexistantDoitLeverUneException() {
+		// Arrange
+		BigDecimal montant = new BigDecimal("100");
+		Compte source = new Compte(NUMERO_SOURCE, "Alice", new BigDecimal("500"), BigDecimal.ZERO);
+		when(repository.trouver(NUMERO_SOURCE)).thenReturn(Optional.of(source));
+		when(repository.trouver(NUMERO_DESTINATION)).thenReturn(Optional.empty());
+
+		// Act + Assert
+		assertThrows(CompteIntrouvableException.class, () -> service.virer(NUMERO_SOURCE, NUMERO_DESTINATION, montant));
 	}
 
 }
