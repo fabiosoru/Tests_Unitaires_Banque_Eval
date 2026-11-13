@@ -331,4 +331,40 @@ class CompteTest {
 		assertFalse(vide);
 	}
 
+	// C7 : estADecouvert() est vrai quand le solde est strictement négatif
+
+	@ParameterizedTest(name = "un solde de {0} est à découvert")
+	@CsvSource({
+			"-0.01",
+			"-200"
+	})
+	void UnCompteAvecUnSoldeNegatifEstADecouvert(BigDecimal soldeInitial) {
+		// Arrange
+		Compte compte = new Compte("FR001", "Alice", soldeInitial, new BigDecimal("200"));
+
+		// Act
+		boolean aDecouvert = compte.estADecouvert();
+
+		// Assert
+		assertTrue(aDecouvert);
+	}
+
+	@ParameterizedTest(name = "un solde de {0} n'est pas à découvert")
+	@CsvSource({
+			"0",
+			"0.00",
+			"0.01",
+			"100"
+	})
+	void UnCompteAvecUnSoldePositifOuNulNEstPasADecouvert(BigDecimal soldeInitial) {
+		// Arrange
+		Compte compte = new Compte("FR001", "Alice", soldeInitial, new BigDecimal("200"));
+
+		// Act
+		boolean aDecouvert = compte.estADecouvert();
+
+		// Assert
+		assertFalse(aDecouvert);
+	}
+
 }
