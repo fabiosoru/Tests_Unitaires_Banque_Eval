@@ -66,4 +66,24 @@ class CalculFraisTest {
 		assertThat(frais).isEqualByComparingTo("2.00");
 	}
 
+	// F3 : les frais de tenue sont offerts aux titulaires de moins de 26 ans
+
+	@ParameterizedTest(name = "un titulaire de {0} ans paie {1} €")
+	@CsvSource({
+			"18, 0",
+			"25, 0",
+			"26, 2.00",
+			"27, 2.00"
+	})
+	void LesFraisDeTenueSontOffertsAuxMoinsDe26Ans(int age, BigDecimal fraisAttendus) {
+		// Arrange
+		BigDecimal soldeMoyen = new BigDecimal("500");
+
+		// Act
+		BigDecimal frais = calcul.fraisMensuels(age, soldeMoyen, false);
+
+		// Assert
+		assertThat(frais).isEqualByComparingTo(fraisAttendus);
+	}
+
 }
