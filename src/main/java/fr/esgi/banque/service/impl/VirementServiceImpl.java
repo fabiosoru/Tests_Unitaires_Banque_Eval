@@ -1,12 +1,14 @@
 package fr.esgi.banque.service.impl;
 
 import fr.esgi.banque.business.Compte;
+import fr.esgi.banque.business.Virement;
 import fr.esgi.banque.service.CompteIntrouvableException;
 import fr.esgi.banque.service.CompteRepository;
 import fr.esgi.banque.service.NotificationService;
 
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.time.LocalDate;
 
 public class VirementServiceImpl {
 
@@ -20,10 +22,15 @@ public class VirementServiceImpl {
 		this.horloge = horloge;
 	}
 
-	public void virer(String numeroSource, String numeroDestination, BigDecimal montant) {
+	public Virement virer(String numeroSource, String numeroDestination, BigDecimal montant) {
 		verifierParametres(numeroSource, numeroDestination, montant);
-		trouverCompte(numeroSource);
-		trouverCompte(numeroDestination);
+		Compte source = trouverCompte(numeroSource);
+		Compte destination = trouverCompte(numeroDestination);
+		source.debiter(montant);
+		destination.crediter(montant);
+		repository.sauvegarder(source);
+		repository.sauvegarder(destination);
+		return new Virement(numeroSource, numeroDestination, montant, LocalDate.now(horloge));
 	}
 
 	private Compte trouverCompte(String numero) {
