@@ -21,6 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 class VirementServiceImplTest {
 
+	private static final String NUMERO_SOURCE = "FR001";
+	private static final String NUMERO_DESTINATION = "FR002";
+
 	@Mock
 	CompteRepository repository;
 	@Mock
@@ -42,7 +45,7 @@ class VirementServiceImplTest {
 	@DisplayName("V1 : un virement d'un montant null est refusé")
 	void UnVirementDUnMontantNullDoitLeverUneException() {
 		// Act + Assert
-		assertThrows(IllegalArgumentException.class, () -> service.virer("FR001", "FR002", null));
+		assertThrows(IllegalArgumentException.class, () -> service.virer(NUMERO_SOURCE, NUMERO_DESTINATION, null));
 	}
 
 	@ParameterizedTest(name = "un virement de {0} € est refusé")
@@ -53,7 +56,7 @@ class VirementServiceImplTest {
 	})
 	void UnVirementDUnMontantNulOuNegatifDoitLeverUneException(BigDecimal montant) {
 		// Act + Assert
-		assertThrows(IllegalArgumentException.class, () -> service.virer("FR001", "FR002", montant));
+		assertThrows(IllegalArgumentException.class, () -> service.virer(NUMERO_SOURCE, NUMERO_DESTINATION, montant));
 	}
 
 }
