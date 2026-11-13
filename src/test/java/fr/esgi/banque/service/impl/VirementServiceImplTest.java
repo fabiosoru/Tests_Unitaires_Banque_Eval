@@ -1,6 +1,7 @@
 package fr.esgi.banque.service.impl;
 
 import fr.esgi.banque.business.Compte;
+import fr.esgi.banque.business.Virement;
 import fr.esgi.banque.service.CompteIntrouvableException;
 import fr.esgi.banque.service.CompteRepository;
 import fr.esgi.banque.service.NotificationService;
@@ -16,10 +17,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -99,6 +104,29 @@ class VirementServiceImplTest {
 
 		// Act + Assert
 		assertThrows(CompteIntrouvableException.class, () -> service.virer(NUMERO_SOURCE, NUMERO_DESTINATION, montant));
+	}
+
+	// V4 : cas nominal, source débitée, destination créditée, les deux sauvegardées, date du jour
+
+	@Test
+	@DisplayName("V4 : un virement valide débite la source, crédite la destination et sauvegarde les deux comptes")
+	void UnVirementValideDebiteLaSourceCrediteLaDestinationEtSauvegardeLesDeuxComptes() {
+		// Arrange
+		BigDecimal montant = new BigDecimal("100");
+		Compte source = new Compte(NUMERO_SOURCE, "Alice", new BigDecimal("500"), BigDecimal.ZERO);
+		Compte destination = new Compte(NUMERO_DESTINATION, "Bob", new BigDecimal("200"), BigDecimal.ZERO);
+		when(repository.trouver(NUMERO_SOURCE)).thenReturn(Optional.of(source));
+		when(repository.trouver(NUMERO_DESTINATION)).thenReturn(Optional.of(destination));
+
+		// Act
+		Virement virement = service.virer(NUMERO_SOURCE, NUMERO_DESTINATION, montant);
+
+		// Assert
+		assertThat(source.getSolde()).isEqualByComparingTo("400");
+		assertThat(destination.getSolde()).isEqualByComparingTo("300");
+		verify(repository).sauvegarder(source);
+		verify(repository).sauvegarder(destination);
+		assertEquals(new Virement(NUMERO_SOURCE, NUMERO_DESTINATION, montant, LocalDate.of(2026, 11, 13)), virement);
 	}
 
 }
