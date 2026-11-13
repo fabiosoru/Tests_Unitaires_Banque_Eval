@@ -19,6 +19,10 @@ public class VirementServiceImpl {
 	}
 
 	public void virer(String numeroSource, String numeroDestination, BigDecimal montant) {
+		verifierParametres(numeroSource, numeroDestination, montant);
+	}
+
+	private void verifierParametres(String numeroSource, String numeroDestination, BigDecimal montant) {
 		if (montant == null || montant.signum() <= 0) {
 			throw new IllegalArgumentException("Le montant du virement doit être strictement positif");
 		}
