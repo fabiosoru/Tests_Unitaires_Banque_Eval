@@ -2,6 +2,8 @@ package fr.esgi.banque.business;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.math.BigDecimal;
 
@@ -256,6 +258,39 @@ class CompteTest {
 
 		// Assert
 		assertThat(compte.getSolde()).isEqualByComparingTo("70.00");
+	}
+
+	// C5 : débit accepté tant que le solde ne passe pas sous découvertAutorisé (limite exacte autorisée)
+
+	@ParameterizedTest(name = "solde 100, découvert 200 : débiter {0} donne un solde de {1}")
+	@CsvSource({
+			"100, 0",
+			"299.99, -199.99",
+			"300, -200"
+	})
+	void UnDebitJusquALaLimiteDuDecouvertEstAccepte(BigDecimal montant, BigDecimal soldeAttendu) {
+		// Arrange
+		Compte compte = new Compte("FR001", "Alice", new BigDecimal("100"), new BigDecimal("200"));
+
+		// Act
+		compte.debiter(montant);
+
+		// Assert
+		assertThat(compte.getSolde()).isEqualByComparingTo(soldeAttendu);
+	}
+
+	@ParameterizedTest(name = "solde 100, découvert 200 : débiter {0} est refusé")
+	@CsvSource({
+			"300.01",
+			"500"
+	})
+	void UnDebitAuDelaDuDecouvertLeveUneExceptionEtNeChangePasLeSolde(BigDecimal montant) {
+		// Arrange
+		Compte compte = new Compte("FR001", "Alice", new BigDecimal("100"), new BigDecimal("200"));
+
+		// Act + Assert
+		assertThrows(SoldeInsuffisantException.class, () -> compte.debiter(montant));
+		assertThat(compte.getSolde()).isEqualByComparingTo("100");
 	}
 
 }
