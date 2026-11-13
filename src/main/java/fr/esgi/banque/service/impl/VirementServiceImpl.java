@@ -26,11 +26,15 @@ public class VirementServiceImpl {
 		verifierParametres(numeroSource, numeroDestination, montant);
 		Compte source = trouverCompte(numeroSource);
 		Compte destination = trouverCompte(numeroDestination);
+		transferer(source, destination, montant);
+		return new Virement(numeroSource, numeroDestination, montant, LocalDate.now(horloge));
+	}
+
+	private void transferer(Compte source, Compte destination, BigDecimal montant) {
 		source.debiter(montant);
 		destination.crediter(montant);
 		repository.sauvegarder(source);
 		repository.sauvegarder(destination);
-		return new Virement(numeroSource, numeroDestination, montant, LocalDate.now(horloge));
 	}
 
 	private Compte trouverCompte(String numero) {
