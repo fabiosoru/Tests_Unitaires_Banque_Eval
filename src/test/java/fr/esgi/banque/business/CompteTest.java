@@ -181,4 +181,36 @@ class CompteTest {
 		assertThat(compte.getDecouvertAutorise()).isEqualByComparingTo("200");
 	}
 
+	// C3 : crediter n'accepte qu'un montant strictement positif
+
+	@Test
+	@DisplayName("C3 : créditer un montant null lève une exception")
+	void CrediterUnMontantNullDoitLeverUneException() {
+		// Arrange
+		Compte compte = new Compte("FR001", "Alice", new BigDecimal("100.00"), new BigDecimal("200"));
+
+		// Act + Assert
+		assertThrows(IllegalArgumentException.class, () -> compte.crediter(null));
+	}
+
+	@Test
+	@DisplayName("C3 : créditer un montant négatif lève une exception")
+	void CrediterUnMontantNegatifDoitLeverUneException() {
+		// Arrange
+		Compte compte = new Compte("FR001", "Alice", new BigDecimal("100.00"), new BigDecimal("200"));
+
+		// Act + Assert
+		assertThrows(IllegalArgumentException.class, () -> compte.crediter(new BigDecimal("-10.00")));
+	}
+
+	@Test
+	@DisplayName("C3 : créditer un montant nul lève une exception")
+	void CrediterUnMontantNulDoitLeverUneException() {
+		// Arrange
+		Compte compte = new Compte("FR001", "Alice", new BigDecimal("100.00"), new BigDecimal("200"));
+
+		// Act + Assert
+		assertThrows(IllegalArgumentException.class, () -> compte.crediter(BigDecimal.ZERO));
+	}
+
 }
