@@ -9,7 +9,9 @@ import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test d'exemple fourni pour vérifier que le projet est bien configuré.
@@ -291,6 +293,42 @@ class CompteTest {
 		// Act + Assert
 		assertThrows(SoldeInsuffisantException.class, () -> compte.debiter(montant));
 		assertThat(compte.getSolde()).isEqualByComparingTo("100");
+	}
+
+	// C6 : estVide() est vrai quand le solde vaut zéro, quelle que soit son écriture
+
+	@ParameterizedTest(name = "un solde de {0} est vide")
+	@CsvSource({
+			"0",
+			"0.0",
+			"0.00"
+	})
+	void UnCompteAvecUnSoldeAZeroEstVide(BigDecimal soldeInitial) {
+		// Arrange
+		Compte compte = new Compte("FR001", "Alice", soldeInitial, new BigDecimal("200"));
+
+		// Act
+		boolean vide = compte.estVide();
+
+		// Assert
+		assertTrue(vide);
+	}
+
+	@ParameterizedTest(name = "un solde de {0} n'est pas vide")
+	@CsvSource({
+			"0.01",
+			"-0.01",
+			"100"
+	})
+	void UnCompteAvecUnSoldeDifferentDeZeroNEstPasVide(BigDecimal soldeInitial) {
+		// Arrange
+		Compte compte = new Compte("FR001", "Alice", soldeInitial, new BigDecimal("200"));
+
+		// Act
+		boolean vide = compte.estVide();
+
+		// Assert
+		assertFalse(vide);
 	}
 
 }
