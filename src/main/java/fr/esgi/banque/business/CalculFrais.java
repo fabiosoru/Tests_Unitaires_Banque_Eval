@@ -30,13 +30,13 @@ public class CalculFrais {
 		if (soldeMoyen == null) {
 			throw new IllegalArgumentException("Le solde moyen est obligatoire");
 		}
+		BigDecimal frais = FRAIS_TENUE;
 		if (ageTitulaire < AGE_JEUNE) {
-			return BigDecimal.ZERO;
+			frais = BigDecimal.ZERO;
 		}
 		if (soldeMoyen.compareTo(SEUIL_GRATUITE) >= 0) {
-			return BigDecimal.ZERO;
+			frais = BigDecimal.ZERO;
 		}
-		BigDecimal frais = FRAIS_TENUE;
 		if (cartePremium) {
 			frais = frais.add(SUPPLEMENT_PREMIUM);
 		}
