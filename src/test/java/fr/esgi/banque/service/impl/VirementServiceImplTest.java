@@ -1,6 +1,7 @@
 package fr.esgi.banque.service.impl;
 
 import fr.esgi.banque.business.Compte;
+import fr.esgi.banque.business.SoldeInsuffisantException;
 import fr.esgi.banque.business.Virement;
 import fr.esgi.banque.service.CompteIntrouvableException;
 import fr.esgi.banque.service.CompteRepository;
@@ -24,6 +25,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -127,6 +130,25 @@ class VirementServiceImplTest {
 		verify(repository).sauvegarder(source);
 		verify(repository).sauvegarder(destination);
 		assertEquals(new Virement(NUMERO_SOURCE, NUMERO_DESTINATION, montant, LocalDate.of(2026, 11, 13)), virement);
+	}
+
+	// V5 : solde insuffisant, la SoldeInsuffisantException remonte et rien n'est sauvegardé
+
+	@Test
+	@DisplayName("V5 : un virement avec un solde insuffisant est refusé et rien n'est sauvegardé")
+	void UnVirementAvecUnSoldeInsuffisantDoitLeverUneExceptionEtNeRienSauvegarder() {
+		// Arrange
+		BigDecimal montant = new BigDecimal("100");
+		Compte source = new Compte(NUMERO_SOURCE, "Alice", new BigDecimal("50"), BigDecimal.ZERO);
+		Compte destination = new Compte(NUMERO_DESTINATION, "Bob", new BigDecimal("200"), BigDecimal.ZERO);
+		when(repository.trouver(NUMERO_SOURCE)).thenReturn(Optional.of(source));
+		when(repository.trouver(NUMERO_DESTINATION)).thenReturn(Optional.of(destination));
+
+		// Act + Assert
+		assertThrows(SoldeInsuffisantException.class, () -> service.virer(NUMERO_SOURCE, NUMERO_DESTINATION, montant));
+		assertThat(source.getSolde()).isEqualByComparingTo("50");
+		assertThat(destination.getSolde()).isEqualByComparingTo("200");
+		verify(repository, never()).sauvegarder(any(Compte.class));
 	}
 
 }
