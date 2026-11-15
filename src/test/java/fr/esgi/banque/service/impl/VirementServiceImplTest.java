@@ -83,7 +83,7 @@ class VirementServiceImplTest {
 		assertThrows(IllegalArgumentException.class, () -> service.virer(NUMERO_SOURCE, NUMERO_SOURCE, montant));
 	}
 
-	// V3 : si l'un des deux comptes n'existe pas, uen exception CompteIntrouvableException est levée
+	// V3 : si l'un des deux comptes n'existe pas, une exception CompteIntrouvableException est levée
 
 	@Test
 	@DisplayName("V3 : un virement depuis un compte source inexistant est refusé")
@@ -146,6 +146,8 @@ class VirementServiceImplTest {
 
 		// Act + Assert
 		assertThrows(SoldeInsuffisantException.class, () -> service.virer(NUMERO_SOURCE, NUMERO_DESTINATION, montant));
+
+		// Assert
 		assertThat(source.getSolde()).isEqualByComparingTo("50");
 		assertThat(destination.getSolde()).isEqualByComparingTo("200");
 		verify(repository, never()).sauvegarder(any(Compte.class));
