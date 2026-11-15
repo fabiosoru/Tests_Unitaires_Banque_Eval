@@ -31,10 +31,10 @@ public class VirementServiceImpl {
 	}
 
 	private void transferer(Compte source, Compte destination, BigDecimal montant) {
-		repository.sauvegarder(source);
-		repository.sauvegarder(destination);
 		source.debiter(montant);
 		destination.crediter(montant);
+		repository.sauvegarder(source);
+		repository.sauvegarder(destination);
 	}
 
 	private Compte trouverCompte(String numero) {
